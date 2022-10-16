@@ -7,20 +7,19 @@ use App\Http\Resources\Products\IndexProductsResource;
 use App\Models\Products;
 
 
-class IndexController extends Controller
+class IndexProducts extends Controller
 {
-    /**
-     * Provision a new web server.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function __invoke()
     {
         // return Products::all();
         // return dd('111');
-        $products = Products::all();
+        // $products = Products::all();
 
-        return IndexProductsResource::collection($products);
+
+        // return (IndexProductsResource::collection($products));
+        $products = Products::all();
+        $produtsJson = IndexProductsResource::collection($products);
+
+        return compact('products', 'produtsJson');
     }
 }

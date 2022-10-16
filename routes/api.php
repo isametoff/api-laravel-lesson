@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\IndexController;
+use App\Http\Controllers\IndexCart;
+use App\Http\Controllers\IndexProducts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,4 +21,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::apiResource('/products', IndexController::class);
+Route::get('/products', IndexProducts::class);
+Route::get('/cart', IndexCart::class);
