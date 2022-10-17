@@ -22,4 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('/products', IndexProducts::class);
-Route::get('/cart', IndexCart::class);
+Route::post('/cart', IndexCart::class);

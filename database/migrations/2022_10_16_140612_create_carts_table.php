@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->nullable()->index()->constrained('products');
-            $table->integer('cnt');
+            $table->integer('product_id')->nullable();
+            $table->integer('cnt')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
