@@ -17,7 +17,7 @@ class IndexCartResource extends JsonResource
         return [
             'id' => $this->product_id,
             'cnt' => $this->cnt,
-            'token' => $this->remember_token,
+            // 'token' => $this->remember_token,
 
         ];
     }

@@ -16,7 +16,8 @@ class Cart extends Model
     protected $fillable =
     [
         'id',
+        'product_id',
         'cnt',
-        'token',
+        'remember_token',
     ];
 }

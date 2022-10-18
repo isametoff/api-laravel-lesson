@@ -24,7 +24,9 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
+            'id' => 'nullable',
             'oldToken' => 'nullable',
+            'cnt' => 'nullable',
         ];
     }
 }

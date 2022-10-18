@@ -22,8 +22,6 @@ class IndexProductsResource extends JsonResource
             'price' => $this->price,
             'rest' => $this->rest,
             'is_published' => $this->is_published,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
         ];
     }
 }

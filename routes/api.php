@@ -1,25 +1,14 @@
 <?php
 
-use App\Http\Controllers\IndexCart;
-use App\Http\Controllers\IndexProducts;
-use Illuminate\Http\Request;
+use App\Http\Controllers\API\Cart\AddToCart;
+use App\Http\Controllers\API\Cart\IndexCart;
+use App\Http\Controllers\API\Cart\RemoveCartProduct;
+use App\Http\Controllers\API\Cart\SetCountProductCart;
+use App\Http\Controllers\IndexProduct;
 use Illuminate\Support\Facades\Route;
 
-
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-Route::get('/products', IndexProducts::class);
 Route::post('/cart', IndexCart::class);
+Route::post('/cart/add', AddToCart::class);
+Route::post('/cart/remove', RemoveCartProduct::class);
+Route::post('/cart/count', SetCountProductCart::class);
+Route::get('/products', IndexProduct::class);
