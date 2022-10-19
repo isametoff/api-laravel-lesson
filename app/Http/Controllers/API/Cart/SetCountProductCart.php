@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\API\Cart;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Cart\StoreRequest;
+use App\Http\Requests\Cart\SetCountRequest;
 use Illuminate\Support\Facades\DB;
 
 class SetCountProductCart extends Controller
 {
-    public function __invoke(StoreRequest $request)
+    public function __invoke(SetCountRequest $request)
     {
         $data = $request->validated();
-        // dd($data);
         if ($data['cnt'] < 1) {
             DB::table('carts')
                 ->where('product_id', $data['id'])

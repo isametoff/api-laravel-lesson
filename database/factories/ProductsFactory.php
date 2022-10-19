@@ -19,7 +19,7 @@ class ProductsFactory extends Factory
         return [
             'title' => $this->faker->unique()->company,
             'description' => $this->faker->paragraph,
-            'content' => $this->faker->title(),
+            'content' => $this->faker->paragraph,
             'price' => $this->faker->numberBetween(1500, 6000),
             'rest' => $this->faker->numberBetween(1, 6),
             'is_published' => 1,

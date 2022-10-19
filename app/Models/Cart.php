@@ -12,6 +12,7 @@ class Cart extends Model
 
     protected $table = 'carts';
     protected $quarded = false;
+    protected $dateFormat = 'U';
 
     protected $fillable =
     [
