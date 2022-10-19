@@ -19,5 +19,7 @@ class Cart extends Model
         'product_id',
         'cnt',
         'remember_token',
+        'updated_at',
+        'deleted_at',
     ];
 }

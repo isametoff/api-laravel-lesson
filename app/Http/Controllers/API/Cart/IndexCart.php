@@ -5,36 +5,21 @@ namespace App\Http\Controllers\API\Cart;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cart\StoreRequest;
 use App\Http\Resources\Cart\IndexCartResource;
-use Illuminate\Support\Str;
 use App\Models\Cart;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class IndexCart extends Controller
 {
     public function __invoke(StoreRequest $request)
     {
         $data = $request->validated();
-        // dd(mb_strlen($data['oldToken']));
-        $newToken = Str::random(40);
-        isset($data['oldToken']) && mb_strlen($data['oldToken']) === 40 && Cart::all()->count() > 0 ? Cart::all() : Cart::create(
-            [
-                'cnt' => 0,
-                'product_id' => 0,
-                'remember_token' => $newToken,
-            ]
-        );
-        $token = isset($data['oldToken']) && mb_strlen($data['oldToken']) === 40 ? $data['oldToken'] : $newToken;
-        foreach (Cart::all() as $key => $value) {
-            if ($value['remember_token'] == $token) {
-                $cart = $value;
-            }
-        }
-        $cart = isset($cart['id']) ? IndexCartResource::make($cart) : '';
-        // dd($cart);
-
-        // dd($token);
-        $needUpdate = isset($data['oldToken']) && $token == $data['oldToken'] ?  true : false;
-        // dd($needUpdate);
+        $token = isset($data['oldToken']) && mb_strlen($data['oldToken']) === 40 ? $data['oldToken'] : Str::random(40);
+        $isData = Cart::where('remember_token', $data['oldToken'])->exists(); //bool
+        $cart = $isData ? Cart::where('remember_token', $token)->get() : [];
+        $singleCart = Cart::where('remember_token', $token)->get();
+        $cart = IndexCartResource::collection($singleCart);
+        $needUpdate = isset($data['oldToken']) && $token == $data['oldToken'] ?  false : true;
 
         return compact('cart', 'token', 'needUpdate');
     }
