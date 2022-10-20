@@ -10,7 +10,7 @@ class LoadRequest extends ApiRequest
     public function rules()
     {
         return [
-            'oldToken' => 'nullable|max:40|min:40',
+            'oldToken' => 'nullable',
         ];
     }
     public function messages()
