@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\Cart;
+namespace App\Http\Resources\User;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class IndexCartResource extends JsonResource
+class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,8 +15,8 @@ class IndexCartResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->product_id,
-            'cnt' => $this->cnt,
+            'login' => $this->login,
+            'email' => $this->email,
         ];
     }
 }
