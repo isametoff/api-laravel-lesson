@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use App\Http\Requests\Cart\ApiRequest;
+use App\Rules\Boolean;
 
 class AuthUserRequest extends ApiRequest
 {
@@ -12,17 +13,19 @@ class AuthUserRequest extends ApiRequest
     {
         return [
 
-            'login' => 'required|string|min:6|max:255',
+            'login' => 'required|min:6|max:255',
             'password' => 'required|min:6|max:255',
+            'isAuth' => 'required'
+
 
         ];
     }
     public function messages()
     {
         return [
-            'required' => 'Это поле необходимо для заполнения',
+            'login.required' => 'Введите логин',
+            'password.required' => 'Введите пароль',
             'min' => 'Минимальное значение 6',
-            'login.unique' => 'Такой логин уже существует ',
         ];
     }
 }

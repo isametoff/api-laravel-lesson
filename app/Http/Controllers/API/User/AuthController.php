@@ -12,9 +12,13 @@ class AuthController extends Controller
     public function __invoke(AuthUserRequest $request)
     {
         $data = $request->validated();
-        $data = User::where('login', $data['login'])->get();
-        $user = AuthResource::collection($data);
+        // dd($data['isAuth'] === "true" && User::where('login', $data['login'])->exists() === true);
+        // dd($data['isAuth'] === "true", $data);
+        $data = $data['isAuth'] === true && User::where('login', $data['login'])->exists() === true ? true : false;
 
-        return compact('user');
+        // $user = AuthResource::collection($data);
+        // return ($data);
+
+        return compact('data');
     }
 }

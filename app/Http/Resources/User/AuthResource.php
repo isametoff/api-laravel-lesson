@@ -14,7 +14,6 @@ class AuthResource extends JsonResource
      */
     public function toArray($request)
     {
-        // dd("🚀 ~ file: AuthResource.php ~ line 16 ~ request", $request);
         return [
             'login' => $this->login,
             'email' => $this->email,

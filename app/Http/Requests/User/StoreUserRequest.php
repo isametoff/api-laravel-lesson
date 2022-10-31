@@ -15,13 +15,13 @@ class StoreUserRequest extends ApiRequest
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|required_with:password_confirmation|same:password_confirmation|confirmed',
             'password_confirmation' => 'required',
+            'register' => 'required',
         ];
     }
     public function messages()
     {
         return [
             'required' => 'Это поле необходимо для заполнения',
-            'nullable' => 'необходимо',
             'min' => 'Минимальное значение 6',
             'login.unique' => 'Такой логин уже существует ',
             'email.unique' => 'Такой email уже существует',

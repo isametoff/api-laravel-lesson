@@ -6,19 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
 
 class RegistrationController extends Controller
 {
     public function __invoke(StoreUserRequest $request)
     {
         $data = $request->validated();
-        User::create([
-            'login' => $data['login'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
-        
-        $data = User::where('email', $data['email'])->where('login', $data['login'])->exists() ?? false;
+        if ($data['register'] === 'true') {
+            User::create([
+                'login' => $data['login'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'remember_token' => Str::random(40),
+            ]);
+        }
+        $data = User::where('email', $data['email'])->where('login', $data['login'])
+        ->exists() ?? $data['register'] === true ?? false;
 
         return compact('data');
     }
