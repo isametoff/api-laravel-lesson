@@ -14,12 +14,11 @@ class RegistrationController extends Controller
     public function __invoke(StoreUserRequest $request)
     {
         $data = $request->validated();
-        if ($data['register'] === 'true') {
+        if ($data['register'] === true) {
             User::create([
                 'login' => $data['login'],
                 'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'remember_token' => Str::random(40),
+                'password' => bcrypt($data['password']),
             ]);
         }
         $data = User::where('email', $data['email'])->where('login', $data['login'])
