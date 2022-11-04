@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 
 class IndexCart extends Controller
 {
+    
     public function __invoke(LoadRequest $request)
     {
         $data = $request->validated();

@@ -5,9 +5,6 @@ namespace App\Http\Controllers\API\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-
 
 class RegistrationController extends Controller
 {
