@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\API\Order;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Cart\LoadRequest;
-use App\Models\Order;
+use App\Http\Requests\Order\StoreOrderRequest;
 
 class IndexOrder extends Controller
 {
@@ -18,8 +17,10 @@ class IndexOrder extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(LoadRequest $request)
+    public function __invoke(StoreOrderRequest $request)
     {
+        $data = $request->validated();
+        return $data;
         return 'Order';
     }
 }

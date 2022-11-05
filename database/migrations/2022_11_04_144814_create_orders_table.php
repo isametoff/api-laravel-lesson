@@ -16,10 +16,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('users')->cascadeOnDelete();
-            $table->integer('price');
-            $table->integer('count');
             $table->unsignedSmallInteger('status')->default('0');
+            $table->rememberToken();
             $table->timestamps();
         });
     }

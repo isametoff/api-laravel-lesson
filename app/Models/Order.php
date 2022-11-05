@@ -16,10 +16,27 @@ class Order extends Model
     protected $fillable =
     [
         'id',
-        'product_id',
-        'cnt',
+        'user_id',
+        'products',
+        'count',
+        'status',
         'remember_token',
         'updated_at',
         'deleted_at',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    public function products()
+    {
+        return $this->belongsToMany(
+            Tag::class,
+            'order_products',
+            'user_id',
+            'product_id',
+            'product_count',
+        );
+    }
 }
