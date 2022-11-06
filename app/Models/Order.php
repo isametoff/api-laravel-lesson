@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory;
 
     protected $table = 'orders';
     protected $quarded = false;
@@ -22,7 +22,6 @@ class Order extends Model
         'status',
         'remember_token',
         'updated_at',
-        'deleted_at',
     ];
 
     public function user()
@@ -31,12 +30,11 @@ class Order extends Model
     }
     public function products()
     {
-        return $this->belongsToMany(
-            Tag::class,
-            'order_products',
-            'user_id',
+        return $this->belongsToMany(OrderProducts::class)->withPivot(
+            'order_id',
             'product_id',
             'product_count',
+            'remember_token',
         );
     }
 }

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('order_id')->nullable()->index()->constrained('orders');
             $table->foreignId('product_id')->nullable()->index()->constrained('products');
             $table->integer('product_count')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 

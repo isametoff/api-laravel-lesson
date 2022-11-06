@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class OrderProducts extends Model
+class OrderProducts extends Pivot
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory;
 
     protected $table = 'order_products';
     protected $quarded = false;
@@ -16,9 +16,10 @@ class OrderProducts extends Model
     protected $fillable =
     [
         'id',
-        'user_id',
+        'order_id',
         'product_id',
         'product_count',
+        'remember_token',
     ];
 
 
