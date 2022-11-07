@@ -4,7 +4,8 @@ use App\Http\Controllers\API\Cart\AddToCart;
 use App\Http\Controllers\API\Cart\IndexCart;
 use App\Http\Controllers\API\Cart\RemoveCartProduct;
 use App\Http\Controllers\API\Cart\SetCountProductCart;
-use App\Http\Controllers\API\Order\IndexOrder;
+use App\Http\Controllers\API\Order\StoreOrder;
+use App\Http\Controllers\API\Order\TransactionOrder;
 use App\Http\Controllers\API\User\RegistrationController;
 use App\Http\Controllers\API\User\AuthController;
 use App\Http\Controllers\IndexProduct;
@@ -26,5 +27,6 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
 });
 
 Route::group(['middleware' => 'api'], function ($router) {
-    Route::post('order', IndexOrder::class);
+    Route::post('order', StoreOrder::class);
+    Route::post('transaction', TransactionOrder::class);
 });

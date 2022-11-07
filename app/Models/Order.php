@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
@@ -17,7 +16,6 @@ class Order extends Model
     [
         'id',
         'user_id',
-        'products',
         'count',
         'status',
         'remember_token',
@@ -30,11 +28,12 @@ class Order extends Model
     }
     public function products()
     {
-        return $this->belongsToMany(OrderProducts::class)->withPivot(
-            'order_id',
-            'product_id',
-            'product_count',
-            'remember_token',
-        );
+        return $this->belongsToMany(OrderProducts::class);
+        // return $this->belongsToMany(OrderProducts::class)->withPivot(
+        //     'order_id',
+        //     'product_id',
+        //     'product_count',
+        //     'remember_token',
+        // );
     }
 }

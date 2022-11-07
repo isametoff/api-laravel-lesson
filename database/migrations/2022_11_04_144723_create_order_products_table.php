@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Order;
+use App\Models\Products;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('order_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->nullable()->index()->constrained('orders');
-            $table->foreignId('product_id')->nullable()->index()->constrained('products');
+            $table->foreignIdFor(Order::class)->constrained();
+            $table->foreignIdFor(Products::class)->constrained();
             $table->integer('product_count')->nullable();
             $table->rememberToken();
             $table->timestamps();
