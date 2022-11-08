@@ -28,46 +28,52 @@ class StoreOrder extends Controller
     {
         $data = $request->validated();
         $user = Auth::user()->id;
-        $tokenPay = Str::random(40);
+        $orderItems = [];
+        $totalPrice = '';
+        $isToken = isset($data['tokenPay']) && mb_strlen($data['tokenPay']) === 40;
+        $isValidTransaction = $orders->where('remember_token', $data['tokenPay'])->exists();
+        $tokenPay = $isValidTransaction && $isToken ? $data['tokenPay'] : Str::random(40);
+        // dd("🚀 ~ file: StoreOrder.php ~ line 33 ~ ", $tokenPay);
+        function productsValue($model, $column, $value)
+        {
+            return $model->where('id', $column)->value($value);
+        }
 
-        $orderTime = $orders->where('remember_token', $data['tokenPay'])->pluck('created_at');
-        dd($orderTime[0]);
-        $Minutesdiff = $orderTime[0]->diffInMinutes(Carbon::now());
-        dd($Minutesdiff);
-        $isValidTransaction =
-            $orders->where('remember_token', $data['tokenPay'])->exists();
-        dd($isValidTransaction);
+        if ($isValidTransaction === true) {
+            // dd($isValidTransaction);
+            $orderCreate = $orders->where('remember_token', $tokenPay)->pluck('created_at');
+            $Minutesdiff = $orderCreate[0]->diffInMinutes(Carbon::now()) < 21;
 
-        $order = $orders->firstOrCreate(
-            [
-                'user_id' => $user,
-                'status' => 0,
-                'remember_token' => $tokenPay,
-            ],
-        );
+            $order = $orders->firstOrCreate(
+                [
+                    'user_id' => $user,
+                    'status' => 0,
+                    'remember_token' => $tokenPay,
+                ],
+            );
 
-        if (isset($data)) {
-            foreach ($data as $value) {
-                foreach ($value as $val) {
-                    $orderProducts->firstOrCreate([
-                        'order_id' => $order->id,
-                        'product_id' => $val['id'],
-                        'product_count' => $val['cnt'],
-                        'remember_token' => $tokenPay,
-                    ]);
-                }
+            foreach ($data['order'] as $val) {
+                $productRest = productsValue($products, $val['id'], 'rest');
+                $cnt = $productRest >= $val['cnt'] ? $val['cnt'] : $productRest;
+                $orderProducts->firstOrCreate([
+                    'order_id' => $order->id,
+                    'product_id' => $val['id'],
+                    'product_count' => $cnt,
+                    'remember_token' => $tokenPay,
+                ]);
             }
+            $orderProductsId = $orderProducts->where('remember_token', $tokenPay)->get();
+            $orderProducts = $orderProducts->where('remember_token', $tokenPay)->pluck('product_id');
+
+            $totalPrice = 0;
+            foreach ($orderProducts as $key => $value) {
+                $totalPrice += $products->where('id', $value)->value('price');
+            }
+
+            $orderItems = OrderProductsResource::collection($orderProductsId);
         }
-        $orderProductsId = $orderProducts->where('remember_token', $tokenPay)->get();
-        $orderProducts = $orderProducts->where('remember_token', $tokenPay)->pluck('product_id');
-        $totalPrice = 0;
 
-        foreach ($orderProducts as $key => $value) {
-            $totalPrice += Products::where('id', $value)->value('price');
-        }
 
-        $ordersItem = OrderProductsResource::collection($orderProductsId);
-
-        return compact('ordersItem', 'tokenPay', 'totalPrice');
+        return compact('orderItems', 'tokenPay', 'totalPrice');
     }
 }
