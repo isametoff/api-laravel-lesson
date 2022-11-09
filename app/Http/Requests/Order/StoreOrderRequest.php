@@ -15,8 +15,8 @@ class StoreOrderRequest extends ApiRequest
     public function rules()
     {
         return [
-            'tokenPay' => 'nullable',
-            'order' => 'nullable',
+            'tokenPay' => 'required',
+            'order' => 'required',
         ];
     }
     public function messages()

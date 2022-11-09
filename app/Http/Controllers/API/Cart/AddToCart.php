@@ -11,16 +11,16 @@ class AddToCart extends Controller
     public function __invoke(AddRequest $request)
     {
         $data = $request->validated();
-        
-            Cart::updateOrInsert(
-                ['product_id' => $data['id'], 'remember_token' => $data['oldToken']],
-                ['cnt' => 1]
-            );
 
-            $addToData = Cart::where('remember_token', $data['oldToken'])
-                ->where('product_id', $data['id'])
-                ->where('product_id', $data['id'])
-                ->exists();
+        Cart::updateOrInsert(
+            ['product_id' => $data['id'], 'remember_token' => $data['oldToken']],
+            ['cnt' => 1]
+        );
+
+        $addToData = Cart::where('remember_token', $data['oldToken'])
+            ->where('product_id', $data['id'])
+            ->where('product_id', $data['id'])
+            ->exists();
 
         return compact('addToData');
     }
