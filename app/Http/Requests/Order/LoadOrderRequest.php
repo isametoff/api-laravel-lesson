@@ -4,7 +4,7 @@ namespace App\Http\Requests\Order;
 
 use App\Http\Requests\Cart\ApiRequest;
 
-class StoreOrderRequest extends ApiRequest
+class LoadOrderRequest extends ApiRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -15,7 +15,7 @@ class StoreOrderRequest extends ApiRequest
     public function rules()
     {
         return [
-            'order' => 'required|array',
+            'tokenPay' => 'required',
         ];
     }
     public function messages()
