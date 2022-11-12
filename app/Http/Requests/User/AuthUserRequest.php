@@ -3,7 +3,6 @@
 namespace App\Http\Requests\User;
 
 use App\Http\Requests\Cart\ApiRequest;
-use App\Rules\Boolean;
 
 class AuthUserRequest extends ApiRequest
 {

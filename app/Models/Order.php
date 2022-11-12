@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\Post\Status;
+use App\Casts\Base64Json;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'orders';
-    protected $quarded = false;
+    protected $quarded = [];
 
     protected $fillable =
     [
@@ -21,6 +24,10 @@ class Order extends Model
         'remember_token',
         'updated_at',
     ];
+    // protected $casts = [
+    //     'status' => Status::class,
+    //     'options' => Base64Json::class
+    // ];
 
     public function user()
     {
@@ -28,12 +35,11 @@ class Order extends Model
     }
     public function products()
     {
-        return $this->belongsToMany(OrderProducts::class);
-        // return $this->belongsToMany(OrderProducts::class)->withPivot(
-        //     'order_id',
-        //     'product_id',
-        //     'product_count',
-        //     'remember_token',
-        // );
+        return $this->belongsToMany(
+            Products::class,
+            'order_products',
+            'order_id',
+            'id',
+        );
     }
 }

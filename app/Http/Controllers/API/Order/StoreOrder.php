@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Order;
 
+use App\Enums\Order\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Resources\Order\OrderProductsResource;
@@ -40,7 +41,7 @@ class StoreOrder extends Controller
         $order = $orders->firstOrCreate(
             [
                 'user_id' => $user,
-                'status' => 0,
+                'status' => Status::ONGOING,
                 'remember_token' => $tokenPay,
             ],
         );
@@ -64,7 +65,7 @@ class StoreOrder extends Controller
 
         foreach ($orderProductsId as $value) {
             $price = $value['product_count'] * $products->where('id', $value['id'])->value('price');
-            
+
             $totalPrice += $price;
         }
 

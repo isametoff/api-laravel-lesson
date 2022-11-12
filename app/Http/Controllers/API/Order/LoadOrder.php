@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Order;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\LoadOrderRequest;
 use App\Http\Resources\Order\OrderProductsResource;
+use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
@@ -33,7 +34,6 @@ class LoadOrder extends Controller
         $isValidTransaction = $orders->where('remember_token', $data['tokenPay'])->exists()
             && $orders->where('user_id', $user)->exists();
         $tokenPay = $isValidTransaction && $isToken ? $data['tokenPay'] : null;
-        // return compact('tokenPay', 'isValidTransaction', 'isToken');
 
         function productsValue($model, $column, $value)
         {
@@ -44,22 +44,14 @@ class LoadOrder extends Controller
         // $orderCreate = $orders->where('remember_token', $tokenPay)->pluck('created_at');
         // $Minutesdiff = $orderCreate[0]->diffInMinutes(Carbon::now()) < 21;
 
-        if ($isValidTransaction) {
+        $ordersUser = $orders->where('user_id', $user);
+        $ordersProducts = $ordersUser->with('products')->get();
+        // $orderss = $orders->whereHas('products', function ($query) {
+        //     $query->where('order_id', 4);
+        // })->get();
 
-            $orderProductsId = $orderProducts->where('remember_token', $tokenPay)->get();
-            $orderProducts = $orders->where('remember_token', $tokenPay)->get();
-            $orderPr = [$orderProducts, $orderProductsId];
+        $orderItems = OrderResource::collection($ordersProducts);
 
-            foreach ($orderProductsId as $value) {
-                $price = $value['product_count'] * $products->where('id', $value['product_id'])->value('price');
-                $totalPrice += $price;
-            }
-
-            $orderItems = OrderProductsResource::collection($orderProductsId);
-            dd($orderPr);
-        }
-
-
-        return compact('orderItems', 'tokenPay', 'totalPrice');
+        return compact('orderItems');
     }
 }

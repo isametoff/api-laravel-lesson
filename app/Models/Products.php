@@ -11,7 +11,7 @@ class Products extends Model
     use SoftDeletes, HasFactory;
 
     protected $table = 'products';
-    protected $quarded = false;
+    protected $quarded = [];
 
     protected $fillable =
     [

@@ -10,7 +10,7 @@ class OrderProducts extends Model
     use HasFactory;
 
     protected $table = 'order_products';
-    protected $quarded = false;
+    protected $quarded = [];
 
     protected $fillable =
     [

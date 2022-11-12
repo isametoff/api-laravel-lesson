@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('status')->default('0');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
