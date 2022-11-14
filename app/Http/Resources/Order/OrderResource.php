@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Order;
 
+use App\Models\Order;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
@@ -20,6 +21,7 @@ class OrderResource extends JsonResource
             'user_id' => $this->user_id,
             'status' => $this->status,
             'tokenPay' => $this->remember_token,
+            'totalPrice' => Order::totalPrice($this->remember_token),
             'products' => OrderProductsResource::collection($this->products),
         ];
     }

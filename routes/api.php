@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Cart\AddToCart;
 use App\Http\Controllers\API\Cart\IndexCart;
 use App\Http\Controllers\API\Cart\RemoveCartProduct;
 use App\Http\Controllers\API\Cart\SetCountProductCart;
+use App\Http\Controllers\API\Order\LoadAllOrders;
 use App\Http\Controllers\API\Order\LoadOrder;
 use App\Http\Controllers\API\Order\StoreOrder;
 use App\Http\Controllers\API\Order\TransactionOrder;
@@ -31,4 +32,5 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('order', StoreOrder::class);
     Route::post('transaction', TransactionOrder::class);
     Route::post('order/load', LoadOrder::class);
+    Route::post('order/all-load', LoadAllOrders::class);
 });

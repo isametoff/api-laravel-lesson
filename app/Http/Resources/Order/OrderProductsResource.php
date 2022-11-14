@@ -18,6 +18,7 @@ class OrderProductsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'price' => $this->price,
+            'count' => $this->pivot->product_count,
         ];
     }
 }

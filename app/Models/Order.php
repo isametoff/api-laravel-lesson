@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\Post\Status;
 use App\Casts\Base64Json;
+use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
 {
@@ -39,7 +40,18 @@ class Order extends Model
             Products::class,
             'order_products',
             'order_id',
-            'id',
-        );
+            'product_id',
+        )->withPivot('product_count',)->withTimestamps();
+    }
+    public static  function totalPrice($token)
+    {
+        $total = 0;
+        $order = Order::where('user_id', Auth::user()->id)->where('remember_token', $token);
+        $orderItem = $order->with('products')->first();
+        foreach ($orderItem->products as $product) {
+            $price = $product->pivot->product_count * $product->price;
+            $total += $price;
+        }
+        return $total;
     }
 }

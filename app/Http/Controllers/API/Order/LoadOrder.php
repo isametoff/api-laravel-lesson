@@ -28,30 +28,12 @@ class LoadOrder extends Controller
     {
         $data = $request->validated();
         $user = Auth::user()->id;
-        $orderItems = [];
-        $totalPrice = 0;
-        $isToken = isset($data['tokenPay']) && $data['tokenPay'] !== false && mb_strlen($data['tokenPay']) === 40;
-        $isValidTransaction = $orders->where('remember_token', $data['tokenPay'])->exists()
-            && $orders->where('user_id', $user)->exists();
-        $tokenPay = $isValidTransaction && $isToken ? $data['tokenPay'] : null;
 
-        function productsValue($model, $column, $value)
-        {
-            return $model->where('id', $column)->value($value);
-        }
-
-        // dd($isValidTransaction);
-        // $orderCreate = $orders->where('remember_token', $tokenPay)->pluck('created_at');
-        // $Minutesdiff = $orderCreate[0]->diffInMinutes(Carbon::now()) < 21;
-
-        $ordersUser = $orders->where('user_id', $user);
+        $ordersUser = $orders->where('user_id', $user)->where('remember_token', $data['tokenPay']);
         $ordersProducts = $ordersUser->with('products')->get();
-        // $orderss = $orders->whereHas('products', function ($query) {
-        //     $query->where('order_id', 4);
-        // })->get();
 
-        $orderItems = OrderResource::collection($ordersProducts);
+        $orderItem = OrderResource::collection($ordersProducts);
 
-        return compact('orderItems');
+        return compact('orderItem');
     }
 }

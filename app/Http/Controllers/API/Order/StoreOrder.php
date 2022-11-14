@@ -69,8 +69,6 @@ class StoreOrder extends Controller
             $totalPrice += $price;
         }
 
-        $orderItems = OrderProductsResource::collection($orderProductsId);
-
-        return compact('orderItems', 'tokenPay', 'totalPrice');
+        return compact('tokenPay');
     }
 }
