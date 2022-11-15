@@ -32,7 +32,7 @@ class LoadOrder extends Controller
         $ordersUser = $orders->where('user_id', $user)->where('remember_token', $data['tokenPay']);
         $ordersProducts = $ordersUser->with('products')->get();
 
-        $orderItem = OrderResource::collection($ordersProducts);
+        $orderItem = OrderResource::collection($ordersProducts)->first();
 
         return compact('orderItem');
     }

@@ -22,6 +22,8 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'tokenPay' => $this->remember_token,
             'totalPrice' => Order::totalPrice($this->remember_token),
+            'created' => $this->created_at->diffForHumans(),
+            'count' => count($this->products),
             'products' => OrderProductsResource::collection($this->products),
         ];
     }

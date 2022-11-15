@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoadAllOrders extends Controller
@@ -24,9 +25,9 @@ class LoadAllOrders extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(LoadOrderRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
+    public function __invoke(Request $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
-        $data = $request->validated();
+        $data = $request;
         $user = Auth::user()->id;
         $orderItems = [];
         $totalPrice = 0;
@@ -46,13 +47,6 @@ class LoadAllOrders extends Controller
 
         $ordersUser = $orders->where('user_id', $user);
         $ordersProducts = $ordersUser->with('products')->get();
-        // foreach ($ordersProducts as $value) {
-        //     dd($value);
-        // }
-        // $orderss = $ordersUser->wherePivot('products', function ($query) {
-        //     return $query->where('order_id', 19);
-        // })->get();
-
         $orderItems = OrderResource::collection($ordersProducts);
 
         return compact('orderItems');

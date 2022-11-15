@@ -36,7 +36,7 @@ class StoreOrder extends Controller
         function productsValue($model, $column, $value)
         {
             return $model->where('id', $column)->value($value);
-        }
+    }
 
         $order = $orders->firstOrCreate(
             [
