@@ -5,12 +5,10 @@ namespace App\Http\Controllers\API\Order;
 use App\Enums\Order\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreOrderRequest;
-use App\Http\Resources\Order\OrderProductsResource;
 use App\Jobs\OrderAfterCreateJob;
 use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 

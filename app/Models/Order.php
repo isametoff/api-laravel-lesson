@@ -50,6 +50,7 @@ class Order extends Model
         $total = 0;
         $order = Order::where('user_id', Auth::user()->id)->where('remember_token', $token);
         $orderItem = $order->with('products')->first();
+        // dd($orderItem->products);
         foreach ($orderItem->products as $product) {
             $price = $product->pivot->product_count * $product->price;
             $total += $price;

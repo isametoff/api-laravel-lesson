@@ -4,13 +4,12 @@ namespace App\Http\Controllers\API\Order;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\LoadTokenPayRequest;
-use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
 use Illuminate\Support\Facades\Auth;
 
-class LoadOrder extends Controller
+class DeleteOrder extends Controller
 {
     /**
      * Create a new AuthController instance.
@@ -25,12 +24,17 @@ class LoadOrder extends Controller
     public function __invoke(LoadTokenPayRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request->validated();
-        $user = Auth::user()->id;
+        $userId = Auth::user()->id;
 
-        $ordersProducts = $orders->orderProducts($data['tokenPay']);
+        function productsValue($model, $column, $value)
+        {
+            return $model->where('id', $column)->value($value);
+        }
 
-        $orderItem = OrderResource::collection($ordersProducts)->first();
+        $ordersUser = Order::where('user_id', $userId)->where('remember_token', $data['tokenPay'])->delete();
+        $message = Order::where('user_id', $userId)->where('remember_token', $data['tokenPay'])
+            ->doesntExist() ? 'Успешно удалён' : 'Ошибка при удалении';
 
-        return compact('orderItem');
+        return compact('message');
     }
 }
