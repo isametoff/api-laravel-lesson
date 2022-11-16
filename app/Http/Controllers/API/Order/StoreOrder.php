@@ -6,6 +6,7 @@ use App\Enums\Order\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Resources\Order\OrderProductsResource;
+use App\Jobs\OrderAfterCreateJob;
 use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
@@ -28,20 +29,18 @@ class StoreOrder extends Controller
     public function __invoke(StoreOrderRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request->validated();
-        $user = Auth::user()->id;
-        $orderItems = [];
-        $totalPrice = 0;
+        $userId = Auth::user()->id;
         $tokenPay = Str::random(40);
 
         function productsValue($model, $column, $value)
         {
             return $model->where('id', $column)->value($value);
-    }
+        }
 
         $order = $orders->firstOrCreate(
             [
-                'user_id' => $user,
-                'status' => Status::ONGOING,
+                'user_id' => $userId,
+                'status' => Status::WAITING,
                 'remember_token' => $tokenPay,
             ],
         );
@@ -55,19 +54,14 @@ class StoreOrder extends Controller
                 'product_count' => $cnt,
                 'remember_token' => $tokenPay,
             ]);
-            // $orderProducts->updateOrInsert([
-            //     'order_id' => $order->id,
-            //     'product_id' => $val['id'],
-            //     'remember_token' => $tokenPay,
-            // ], ['product_count' => $cnt,]);
+            $products->where('id', $val['id'])
+                ->update([
+                    'rest' => $productRest - $cnt,
+                ]);
         }
-        $orderProductsId = $orderProducts->where('remember_token', $tokenPay)->get();
 
-        foreach ($orderProductsId as $value) {
-            $price = $value['product_count'] * $products->where('id', $value['id'])->value('price');
+        OrderAfterCreateJob::dispatch(compact('tokenPay', 'userId'))->delay(now()->addSeconds(5)); // addMinutes or addSeconds
 
-            $totalPrice += $price;
-        }
 
         return compact('tokenPay');
     }

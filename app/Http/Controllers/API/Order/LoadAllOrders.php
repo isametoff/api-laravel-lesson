@@ -28,25 +28,12 @@ class LoadAllOrders extends Controller
     public function __invoke(Request $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request;
-        $user = Auth::user()->id;
-        $orderItems = [];
-        $totalPrice = 0;
-        $isToken = isset($data['tokenPay']) && $data['tokenPay'] !== false && mb_strlen($data['tokenPay']) === 40;
-        $isValidTransaction = $orders->where('remember_token', $data['tokenPay'])->exists()
-            && $orders->where('user_id', $user)->exists();
-        $tokenPay = $isValidTransaction && $isToken ? $data['tokenPay'] : null;
-
-        function productsValue($model, $column, $value)
-        {
-            return $model->where('id', $column)->value($value);
-        }
 
         // dd($isValidTransaction);
         // $orderCreate = $orders->where('remember_token', $tokenPay)->pluck('created_at');
         // $Minutesdiff = $orderCreate[0]->diffInMinutes(Carbon::now()) < 21;
 
-        $ordersUser = $orders->where('user_id', $user);
-        $ordersProducts = $ordersUser->with('products')->get();
+        $ordersProducts = $orders->ordersProducts();
         $orderItems = OrderResource::collection($ordersProducts);
 
         return compact('orderItems');

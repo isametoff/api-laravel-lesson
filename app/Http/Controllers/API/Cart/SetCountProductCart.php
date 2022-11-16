@@ -12,7 +12,7 @@ class SetCountProductCart extends Controller
     {
         $data = $request->validated();
         if ($data['cnt'] < 1) {
-            DB::table('carts')
+            DB::table('carts') 
                 ->where('product_id', $data['id'])
                 ->where('remember_token', '=', $data['oldToken'])
                 ->delete();

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Enums\Order\Status;
 use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
@@ -12,9 +11,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
-class StoreOrderJob implements ShouldQueue
+class OrderAfterCreateJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -34,8 +33,13 @@ class StoreOrderJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(Products $products, OrderProducts $orderProducts, Order $orders)
     {
+        $userId = $this->data['userId'];
+        $tokenPay = $this->data['tokenPay'];
+        $orderReserve = $orders->orderReserve($userId, $tokenPay);
+
+        Log::info($orderReserve);
     }
 
     // public function failed()

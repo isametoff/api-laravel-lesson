@@ -29,8 +29,7 @@ class LoadOrder extends Controller
         $data = $request->validated();
         $user = Auth::user()->id;
 
-        $ordersUser = $orders->where('user_id', $user)->where('remember_token', $data['tokenPay']);
-        $ordersProducts = $ordersUser->with('products')->get();
+        $ordersProducts = $orders->orderProducts($data['tokenPay']);
 
         $orderItem = OrderResource::collection($ordersProducts)->first();
 

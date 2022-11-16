@@ -4,16 +4,16 @@ namespace App\Enums\Order;
 
 enum Status: int
 {
-    case ONGOING = 0;
-    case DELIVERED = 1;
-    case CANCELED = 2;
+    case WAITING = 0;
+    case CANCELED = 1;
+    case DELIVERED = 2;
 
     public function text()
     {
         return match ($this->value) {
-            self::ONGOING->value => 'ONGOING',
+            self::WAITING->value => 'WAITING',
+            self::CANCELED->value => 'CANCELED',
             self::DELIVERED->value => 'DELIVERED',
-            self::CANCELED->value => 'CANCELED'
         };
     }
 }
