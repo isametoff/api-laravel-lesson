@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API\Order;
 
 use App\Enums\Order\Status;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Order\LoadTokenPayRequest;
+use App\Http\Requests\Order\LoadOrderIdRequest;
 use App\Jobs\OrderAfterCreateJob;
 use App\Models\Order;
 use App\Models\OrderProducts;
@@ -24,53 +24,46 @@ class RepeatOrder extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(LoadTokenPayRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
+    public function __invoke(LoadOrderIdRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request->validated();
         $userId = Auth::user()->id;
-        $tokenPay = Str::random(40);
-        $tokenExample = $data['tokenPay'];
+        $orderId = $data['orderId'];
 
-        $orderExample = $orders->orderProducts($tokenExample)->first();
+        $orderExample = $orders->orderProducts($orderId)->first();
 
         $orderRepeat = $orderExample->replicate([
             'created_at',
             'updated_at'
         ])->fill([
             'status' => Status::WAITING,
-            'remember_token' => $tokenPay
+            'id' => $orders->id
         ]);
-
         $orderRepeat->save();
-
-        // return compact('orderRepeat');
-
+        $orderIdRepeat = $orderRepeat->id;
 
         function productsValue($model, $column, $value)
         {
             return $model->where('id', $column)->value($value);
         }
 
-        $asd = $orderExample->products;
-        foreach ($asd as $val) {
-            // return $val;
-            $productRest = productsValue($products, $val->pivot->product_id, 'rest');
+        foreach ($orderExample->products as $val) {
+            $productRest = productsValue($products, $val->pivot->products_id, 'rest');
             $cnt = $productRest >= $val->pivot->product_count ? $val->pivot->product_count : $productRest;
             $orderProducts->firstOrCreate([
                 'order_id' => $orderRepeat->id,
-                'product_id' => $val->pivot->product_id,
+                'products_id' => $val->pivot->products_id,
                 'product_count' => $cnt,
-                'remember_token' => $tokenPay,
             ]);
-            $products->where('id', $val->pivot->product_id)
+            $products->where('id', $val->pivot->products_id)
                 ->update([
                     'rest' => $productRest - $cnt,
                 ]);
         }
 
-        OrderAfterCreateJob::dispatch(compact('tokenPay', 'userId'))->delay(now()->addSeconds(5));
+        OrderAfterCreateJob::dispatch(compact('orderIdRepeat', 'userId'))->delay(now()->addSeconds(0));
 
 
-        return compact('tokenPay');
+        return compact('orderIdRepeat');
     }
 }

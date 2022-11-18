@@ -10,7 +10,6 @@ use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class StoreOrder extends Controller
 {
@@ -28,39 +27,40 @@ class StoreOrder extends Controller
     {
         $data = $request->validated();
         $userId = Auth::user()->id;
-        $tokenPay = Str::random(40);
 
         function productsValue($model, $column, $value)
         {
+            // dd($value);
             return $model->where('id', $column)->value($value);
         }
-
         $order = $orders->firstOrCreate(
             [
+
+                'id' => $orders->id,
                 'user_id' => $userId,
                 'status' => Status::WAITING,
-                'remember_token' => $tokenPay,
             ],
         );
-
+        $orderIdRepeat = $order->id;
         foreach ($data['order'] as $val) {
             $productRest = productsValue($products, $val['id'], 'rest');
             $cnt = $productRest >= $val['cnt'] ? $val['cnt'] : $productRest;
             $orderProducts->firstOrCreate([
                 'order_id' => $order->id,
-                'product_id' => $val['id'],
+                'products_id' => $val['id'],
                 'product_count' => $cnt,
-                'remember_token' => $tokenPay,
             ]);
+            $asd = $products->where('id', $val['id'])->get();
+
             $products->where('id', $val['id'])
                 ->update([
                     'rest' => $productRest - $cnt,
                 ]);
         }
 
-        OrderAfterCreateJob::dispatch(compact('tokenPay', 'userId'))->delay(now()->addSeconds(5)); // addMinutes or addSeconds
+        OrderAfterCreateJob::dispatch(compact('orderIdRepeat', 'userId'))->delay(now()->addSeconds(0)); // addMinutes or addSeconds
 
 
-        return compact('tokenPay');
+        return compact('orderIdRepeat');
     }
 }

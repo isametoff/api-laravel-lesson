@@ -20,8 +20,8 @@ return new class extends Migration
             $table->foreignIdFor(Order::class)->constrained();
             $table->foreignIdFor(Products::class)->constrained();
             $table->integer('product_count')->nullable();
-            $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

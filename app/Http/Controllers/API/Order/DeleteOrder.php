@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API\Order;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Order\LoadTokenPayRequest;
+use App\Http\Requests\Order\LoadOrderIdRequest;
 use App\Models\Order;
 use App\Models\OrderProducts;
 use App\Models\Products;
@@ -21,19 +21,12 @@ class DeleteOrder extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(LoadTokenPayRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
+    public function __invoke(LoadOrderIdRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request->validated();
         $userId = Auth::user()->id;
 
-        function productsValue($model, $column, $value)
-        {
-            return $model->where('id', $column)->value($value);
-        }
-
-        $ordersUser = Order::where('user_id', $userId)->where('remember_token', $data['tokenPay'])->delete();
-        $message = Order::where('user_id', $userId)->where('remember_token', $data['tokenPay'])
-            ->doesntExist() ? 'Успешно удалён' : 'Ошибка при удалении';
+        $message = $orders->orderDelete($userId, $data['orderId']);
 
         return compact('message');
     }

@@ -28,21 +28,21 @@ class TransactionOrder extends Controller
     {
         $data = $request->validated();
         $user = Auth::user()->id;
-        $tokenPay = Str::random(40);
+        $orderId = Str::random(40);
 
-        $orderTime = $orders->where('remember_token', $data['tokenPay'])->pluck('created_at');
+        $orderTime = $orders->where('id', $data['orderId'])->pluck('created_at');
         dd($orderTime[0]);
         $Minutesdiff = $orderTime[0]->diffInMinutes(Carbon::now());
         dd($Minutesdiff);
         $isValidTransaction =
-            $orders->where('remember_token', $data['tokenPay'])->exists();
+            $orders->where('id', $data['orderId'])->exists();
         dd($isValidTransaction);
 
         $order = $orders->firstOrCreate(
             [
                 'user_id' => $user,
                 'status' => 0,
-                'remember_token' => $tokenPay,
+                'id' => $orderId,
             ],
         );
 
@@ -51,15 +51,15 @@ class TransactionOrder extends Controller
                 foreach ($value as $val) {
                     $orderProducts->firstOrCreate([
                         'order_id' => $order->id,
-                        'product_id' => $val['id'],
+                        'products_id' => $val['id'],
                         'product_count' => $val['cnt'],
-                        'remember_token' => $tokenPay,
+                        'id' => $orderId,
                     ]);
                 }
             }
         }
-        $orderProductsId = $orderProducts->where('remember_token', $tokenPay)->get();
-        $orderProducts = $orderProducts->where('remember_token', $tokenPay)->pluck('product_id');
+        $orderProductsId = $orderProducts->where('id', $orderId)->get();
+        $orderProducts = $orderProducts->where('id', $orderId)->pluck('products_id');
         $totalPrice = 0;
 
         foreach ($orderProducts as $key => $value) {
@@ -68,6 +68,6 @@ class TransactionOrder extends Controller
 
         $ordersItem = OrderProductsResource::collection($orderProductsId);
 
-        return compact('ordersItem', 'tokenPay', 'totalPrice');
+        return compact('ordersItem', 'orderId', 'totalPrice');
     }
 }

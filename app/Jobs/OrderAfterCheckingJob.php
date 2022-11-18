@@ -36,8 +36,8 @@ class OrderAfterCheckingJob implements ShouldQueue
     public function handle(Products $products, OrderProducts $orderProducts, Order $orders)
     {
         $userId = $this->data['userId'];
-        $tokenPay = $this->data['tokenPay'];
-        $orders->orderCanceled($userId, $tokenPay);
+        $orderId = $this->data['orderId'];
+        $orders->orderCanceled($userId, $orderId);
 
         Log::info('Готово2');
     }

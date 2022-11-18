@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API\Order;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Order\LoadTokenPayRequest;
+use App\Http\Requests\Order\LoadOrderIdRequest;
 use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
 use App\Models\OrderProducts;
@@ -22,12 +22,12 @@ class LoadOrder extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(LoadTokenPayRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
+    public function __invoke(LoadOrderIdRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request->validated();
         $user = Auth::user()->id;
 
-        $ordersProducts = $orders->orderProducts($data['tokenPay']);
+        $ordersProducts = $orders->orderProducts($data['orderId']);
 
         $orderItem = OrderResource::collection($ordersProducts)->first();
 

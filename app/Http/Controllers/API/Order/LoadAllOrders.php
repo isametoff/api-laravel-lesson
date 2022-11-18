@@ -24,7 +24,7 @@ class LoadAllOrders extends Controller
         $data = $request;
 
         // dd($isValidTransaction);
-        // $orderCreate = $orders->where('remember_token', $tokenPay)->pluck('created_at');
+        // $orderCreate = $orders->where('id', $orderId)->pluck('created_at');
         // $Minutesdiff = $orderCreate[0]->diffInMinutes(Carbon::now()) < 21;
 
         $ordersProducts = $orders->ordersProducts();

@@ -11,15 +11,15 @@ class RemoveCartProduct extends Controller
     public function __invoke(RemoveRequest $request)
     {
         $data = $request->validated();
-        
+
         DB::table('carts')
             ->where('remember_token', $data['oldToken'])
-            ->where('product_id', $data['id'])
+            ->where('products_id', $data['id'])
             ->delete();
 
         $removeData = DB::table('carts')
             ->where('remember_token', $data['oldToken'])
-            ->where('product_id', $data['id'])
+            ->where('products_id', $data['id'])
             ->doesntExist();
 
         return compact('removeData');

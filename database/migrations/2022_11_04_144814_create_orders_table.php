@@ -18,7 +18,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
             $table->unsignedSmallInteger('status')->default('0');
-            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });

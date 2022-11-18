@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderProducts extends Pivot
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'order_products';
     protected $quarded = [];
@@ -17,9 +17,10 @@ class OrderProducts extends Pivot
     [
         'id',
         'order_id',
-        'product_id',
+        'products_id',
         'product_count',
-        'remember_token',
+        'updated_at',
+        'deleted_at',
     ];
 
     // public function orders()

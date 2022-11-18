@@ -13,13 +13,13 @@ class AddToCart extends Controller
         $data = $request->validated();
 
         Cart::updateOrInsert(
-            ['product_id' => $data['id'], 'remember_token' => $data['oldToken']],
+            ['products_id' => $data['id'], 'remember_token' => $data['oldToken']],
             ['cnt' => 1]
         );
 
         $addToData = Cart::where('remember_token', $data['oldToken'])
-            ->where('product_id', $data['id'])
-            ->where('product_id', $data['id'])
+            ->where('products_id', $data['id'])
+            ->where('products_id', $data['id'])
             ->exists();
 
         return compact('addToData');

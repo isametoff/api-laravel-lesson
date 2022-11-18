@@ -24,8 +24,8 @@ class Order extends Model
         'user_id',
         'count',
         'status',
-        'remember_token',
         'updated_at',
+        'deleted_at',
     ];
     // protected $casts = [
     //     'status' => Status::class,
@@ -42,25 +42,25 @@ class Order extends Model
             Products::class,
             'order_products',
             'order_id',
-            'product_id',
+            'products_id',
         )->withPivot('product_count',)->withTimestamps();
     }
-    public static  function totalPrice($token)
+    public static  function totalPrice($userId)
     {
         $total = 0;
-        $order = Order::where('user_id', Auth::user()->id)->where('remember_token', $token);
+        $order = Order::where('user_id', Auth::user()->id)->where('id', $userId);
         $orderItem = $order->with('products')->first();
-        // dd($orderItem->products);
         foreach ($orderItem->products as $product) {
             $price = $product->pivot->product_count * $product->price;
             $total += $price;
         }
         return $total;
     }
-    public function orderProducts($tokenPay)
+    public function orderProducts($orderId)
     {
-        $ordersUser = Order::where('user_id', Auth::user()->id)->where('remember_token', $tokenPay);
+        $ordersUser = Order::where('user_id', Auth::user()->id)->where('id', $orderId);
         $ordersProducts = $ordersUser->with('products')->get();
+        // dd(Auth::user()->id);
         return $ordersProducts;
     }
     public function ordersProducts()
@@ -69,19 +69,30 @@ class Order extends Model
         $ordersProducts = $ordersUser->with('products')->get();
         return $ordersProducts;
     }
-    public function orderReserve($userId, $tokenPay)
+    public function orderDelete($userId, $orderId)
     {
-        $ordersUser = Order::where('user_id', $userId)->where('remember_token', $tokenPay);
+        $ordersUserExist = Order::where('user_id', $userId)->where('id', $orderId)
+            ->exists();
+        Order::where('user_id', $userId)->where('id', $orderId)->delete();
+        OrderProducts::where('order_id', $orderId)->delete();
+        $message = $ordersUserExist ? Order::where('user_id', $userId)
+            ->where('id', $orderId)->doesntExist()
+            ? 'Успешно удалён' : 'Ошибка при удалении' : 'Товар уже удалён';
+        return $message;
+    }
+    public function orderReserve($userId, $orderId)
+    {
+        $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
         $orderProducts = $ordersUser->with('products')->first();
         $waiting = get_object_vars(Status::WAITING);
 
         if ($ordersUser->first()->status === $waiting['value']) {
-            OrderAfterCheckingJob::dispatch(compact('tokenPay', 'userId'))->delay(now()->addSeconds(10));
+            OrderAfterCheckingJob::dispatch(compact('orderId', 'userId'))->delay(now()->addSeconds(10));
         }
     }
-    public function orderCanceled($userId, $tokenPay)
+    public function orderCanceled($userId, $orderId)
     {
-        $ordersUser = Order::where('user_id', $userId)->where('remember_token', $tokenPay);
+        $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
         $orderProducts = $ordersUser->with('products')->first();
         $waiting = get_object_vars(Status::WAITING);
         $canceled = get_object_vars(Status::CANCELED);
@@ -89,17 +100,17 @@ class Order extends Model
 
         if ($ordersUser->first()->status === $waiting['value']) {
             foreach ($orderProducts->products as $product) {
-                $rest = Products::where('id', $product->pivot->product_id)->value('rest');
-                Products::where('id', $product->pivot->product_id)
+                $rest = Products::where('id', $product->pivot->products_id)->value('rest');
+                Products::where('id', $product->pivot->products_id)
                     ->update([
                         'rest' => $rest + $product->pivot->product_count,
                     ]);
             }
-            Order::where('user_id', $userId)->where('remember_token', $tokenPay)->delete();
+            $this->orderDelete($userId, $orderId);
         } elseif ($ordersUser->first()->status === $canceled['value']) {
             foreach ($orderProducts->products as $product) {
-                $rest = Products::where('id', $product->pivot->product_id)->value('rest');
-                Products::where('id', $product->pivot->product_id)
+                $rest = Products::where('id', $product->pivot->products_id)->value('rest');
+                Products::where('id', $product->pivot->products_id)
                     ->update([
                         'rest' => $rest + $product->pivot->product_count,
                     ]);
