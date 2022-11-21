@@ -7,6 +7,7 @@ enum Status: int
     case WAITING = 0;
     case CANCELED = 1;
     case DELIVERED = 2;
+    case ADDED = 3;
 
     public function text()
     {
@@ -14,6 +15,7 @@ enum Status: int
             self::WAITING->value => 'WAITING',
             self::CANCELED->value => 'CANCELED',
             self::DELIVERED->value => 'DELIVERED',
+            self::ADDED->value => 'ADDED',
         };
     }
 }
