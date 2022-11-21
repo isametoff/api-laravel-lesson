@@ -15,7 +15,7 @@ class StoreOrderRequest extends ApiRequest
     public function rules()
     {
         return [
-            'order' => 'required|array',
+            'orderId' => 'required|numeric',
         ];
     }
     public function messages()

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\API\Order;
 
+use App\Enums\Order\Status;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Order\LoadOrderIdRequest;
+use App\Http\Requests\Order\NullOrderIdRequest;
 use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
 use App\Models\OrderProducts;
@@ -22,12 +23,14 @@ class LoadOrder extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(LoadOrderIdRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
+    public function __invoke(NullOrderIdRequest $request, Order $orders, Products $products, OrderProducts $orderProducts)
     {
         $data = $request->validated();
         $user = Auth::user()->id;
 
-        $ordersProducts = $orders->orderProducts($data['orderId']);
+        $ordersItems = $orders->where('user_id', $user)->whereIn('status', [Status::WAITING, Status::ADDED]);
+        $ordersItemsDesc = $ordersItems->orderByDesc('updated_at')->first();
+        $ordersProducts = $orders->orderProducts($ordersItemsDesc->id);
 
         $orderItem = OrderResource::collection($ordersProducts)->first();
 

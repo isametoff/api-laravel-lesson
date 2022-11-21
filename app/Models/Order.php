@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Casts\Base64Json;
 use App\Enums\Order\Status;
 use App\Jobs\OrderAfterCheckingJob;
+use App\Jobs\OrderAfterCreateJob;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,19 +61,60 @@ class Order extends Model
     {
         $ordersUser = Order::where('user_id', Auth::user()->id)->where('id', $orderId);
         $ordersProducts = $ordersUser->with('products')->get();
-        // dd(Auth::user()->id);
         return $ordersProducts;
     }
     public function ordersProducts()
     {
-        $ordersUser = Order::where('user_id', Auth::user()->id);
+        $ordersUser = Order::where('user_id', Auth::user()->id)->where('status', '!=', Status::ADDED);
         $ordersProducts = $ordersUser->with('products')->get();
         return $ordersProducts;
     }
-    public function orderDelete($userId, $orderId)
+    public static function productsValue($model, $column, $value)
+    {
+        return $model->where('id', $column)->value($value);
+    }
+    public static function addingOrder($data)
+    {
+        $userId = Auth::user()->id;
+
+        $order = Order::create([
+            'user_id' => $userId,
+            'status' => Status::ADDED,
+        ]);
+        $orderId = $order->id;
+        foreach ($data['order'] as $val) {
+            $productRest = Order::productsValue(Products::all(), $val['id'], 'rest');
+            $cnt = $productRest >= $val['cnt'] ? $val['cnt'] : $productRest;
+            OrderProducts::firstOrCreate([
+                'order_id' => $order->id,
+                'products_id' => $val['id'],
+                'product_count' => $cnt,
+            ]);
+            Products::where('id', $val['id'])->update([
+                'rest' => $productRest - $cnt,
+            ]);
+        }
+        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(5));
+        // addMinutes or addSeconds or addDays
+        return $orderId;
+    }
+    public static function storeOrder($data)
+    {
+        $userId = Auth::user()->id;
+        $orderId = $data['orderId'];
+
+        Order::where('id', $orderId)->update([
+            'status' => Status::WAITING,
+        ]);
+        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(5));
+        
+        return $orderId;
+    }
+    public function deleteOrder($userId, $orderId)
     {
         $ordersUserExist = Order::where('user_id', $userId)->where('id', $orderId)
             ->exists();
+        $this->returnReservedProduct($userId, $orderId);
         Order::where('user_id', $userId)->where('id', $orderId)->delete();
         OrderProducts::where('order_id', $orderId)->delete();
         $message = $ordersUserExist ? Order::where('user_id', $userId)
@@ -85,9 +127,13 @@ class Order extends Model
         $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
         $orderProducts = $ordersUser->with('products')->first();
         $waiting = get_object_vars(Status::WAITING);
+        $added = get_object_vars(Status::ADDED);
 
+        if ($ordersUser->first()->status === $added['value']) {
+            $this->deleteOrder($userId, $orderId);
+        }
         if ($ordersUser->first()->status === $waiting['value']) {
-            OrderAfterCheckingJob::dispatch(compact('orderId', 'userId'))->delay(now()->addSeconds(10));
+            OrderAfterCheckingJob::dispatch(compact('orderId', 'userId'))->delay(now()->addSeconds(6));
         }
     }
     public function orderCanceled($userId, $orderId)
@@ -99,14 +145,7 @@ class Order extends Model
 
 
         if ($ordersUser->first()->status === $waiting['value']) {
-            foreach ($orderProducts->products as $product) {
-                $rest = Products::where('id', $product->pivot->products_id)->value('rest');
-                Products::where('id', $product->pivot->products_id)
-                    ->update([
-                        'rest' => $rest + $product->pivot->product_count,
-                    ]);
-            }
-            $this->orderDelete($userId, $orderId);
+            $this->deleteOrder($userId, $orderId);
         } elseif ($ordersUser->first()->status === $canceled['value']) {
             foreach ($orderProducts->products as $product) {
                 $rest = Products::where('id', $product->pivot->products_id)->value('rest');
@@ -115,6 +154,19 @@ class Order extends Model
                         'rest' => $rest + $product->pivot->product_count,
                     ]);
             }
+        }
+    }
+    public function returnReservedProduct($userId, $orderId)
+    {
+        $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
+        $orderProducts = $ordersUser->with('products')->first();
+
+        foreach ($orderProducts->products as $product) {
+            $rest = Products::where('id', $product->pivot->products_id)->value('rest');
+            Products::where('id', $product->pivot->products_id)
+                ->update([
+                    'rest' => $rest + $product->pivot->product_count,
+                ]);
         }
     }
 }

@@ -36,8 +36,8 @@ class OrderAfterCreateJob implements ShouldQueue
     public function handle(Products $products, OrderProducts $orderProducts, Order $orders)
     {
         $userId = $this->data['userId'];
-        $orderIdRepeat = $this->data['orderIdRepeat'];
-        $orderReserve = $orders->orderReserve($userId, $orderIdRepeat);
+        $orderId = $this->data['orderId'];
+        $orderReserve = $orders->orderReserve($userId, $orderId);
 
         Log::info($orderReserve);
     }

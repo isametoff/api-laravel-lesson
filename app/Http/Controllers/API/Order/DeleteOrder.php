@@ -26,7 +26,7 @@ class DeleteOrder extends Controller
         $data = $request->validated();
         $userId = Auth::user()->id;
 
-        $message = $orders->orderDelete($userId, $data['orderId']);
+        $message = $orders->deleteOrder($userId, $data['orderId']);
 
         return compact('message');
     }
