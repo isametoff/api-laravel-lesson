@@ -2,26 +2,15 @@
 
 namespace App\Http\Controllers\API\Order;
 
+use App\Actions\Orders\AddingOrder as AddingOrderAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\AddingOrderRequest;
-use App\Models\Order;
 
 class AddingOrder extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __invoke(AddingOrderRequest $request, AddingOrderAction $addingOrderAction)
     {
-        $this->middleware('auth:api');
-    }
-
-    public function __invoke(AddingOrderRequest $request)
-    {
-        $data = $request->validated();
-        $orderId = Order::addingOrder($data);
+        $orderId = $addingOrderAction($request->validated());
         return compact('orderId');
     }
 }

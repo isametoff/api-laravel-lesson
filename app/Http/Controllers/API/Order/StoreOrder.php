@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API\Order;
 
+use App\Actions\Orders\StoreOrder as StoreOrderAction;
+use App\Contracts\OrdersContract;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Models\Order;
@@ -18,10 +20,9 @@ class StoreOrder extends Controller
         $this->middleware('auth:api');
     }
 
-    public function __invoke(StoreOrderRequest $request)
+    public function __invoke(StoreOrderRequest $request, StoreOrderAction $storeOrderAction)
     {
-        $data = $request->validated();
-        $orderId = Order::storeOrder($data);
+        $orderId = $storeOrderAction($request->validated());
         return compact('orderId');
     }
 }

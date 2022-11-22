@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Casts\Base64Json;
 use App\Enums\Order\Status;
 use App\Jobs\OrderAfterCheckingJob;
-use App\Jobs\OrderAfterCreateJob;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,10 +56,11 @@ class Order extends Model
         }
         return $total;
     }
-    public function orderProducts($orderId)
+    public static function orderProducts($orderId)
     {
         $ordersUser = Order::where('user_id', Auth::user()->id)->where('id', $orderId);
         $ordersProducts = $ordersUser->with('products')->get();
+        // dd($ordersProducts);
         return $ordersProducts;
     }
     public function ordersProducts()
@@ -72,55 +72,6 @@ class Order extends Model
     public static function productsValue($model, $column, $value)
     {
         return $model->where('id', $column)->value($value);
-    }
-    public static function addingOrder($data)
-    {
-        $userId = Auth::user()->id;
-
-        $order = Order::create([
-            'user_id' => $userId,
-            'status' => Status::ADDED,
-        ]);
-        $orderId = $order->id;
-        foreach ($data['order'] as $val) {
-            $productRest = Order::productsValue(Products::all(), $val['id'], 'rest');
-            $cnt = $productRest >= $val['cnt'] ? $val['cnt'] : $productRest;
-            OrderProducts::firstOrCreate([
-                'order_id' => $order->id,
-                'products_id' => $val['id'],
-                'product_count' => $cnt,
-            ]);
-            Products::where('id', $val['id'])->update([
-                'rest' => $productRest - $cnt,
-            ]);
-        }
-        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(5));
-        // addMinutes or addSeconds or addDays
-        return $orderId;
-    }
-    public static function storeOrder($data)
-    {
-        $userId = Auth::user()->id;
-        $orderId = $data['orderId'];
-
-        Order::where('id', $orderId)->update([
-            'status' => Status::WAITING,
-        ]);
-        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(5));
-        
-        return $orderId;
-    }
-    public function deleteOrder($userId, $orderId)
-    {
-        $ordersUserExist = Order::where('user_id', $userId)->where('id', $orderId)
-            ->exists();
-        $this->returnReservedProduct($userId, $orderId);
-        Order::where('user_id', $userId)->where('id', $orderId)->delete();
-        OrderProducts::where('order_id', $orderId)->delete();
-        $message = $ordersUserExist ? Order::where('user_id', $userId)
-            ->where('id', $orderId)->doesntExist()
-            ? 'Успешно удалён' : 'Ошибка при удалении' : 'Товар уже удалён';
-        return $message;
     }
     public function orderReserve($userId, $orderId)
     {
@@ -156,7 +107,7 @@ class Order extends Model
             }
         }
     }
-    public function returnReservedProduct($userId, $orderId)
+    public static function returnReservedProduct($userId, $orderId)
     {
         $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
         $orderProducts = $ordersUser->with('products')->first();

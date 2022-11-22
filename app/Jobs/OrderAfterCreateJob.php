@@ -3,14 +3,11 @@
 namespace App\Jobs;
 
 use App\Models\Order;
-use App\Models\OrderProducts;
-use App\Models\Products;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class OrderAfterCreateJob implements ShouldQueue
@@ -33,7 +30,7 @@ class OrderAfterCreateJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Products $products, OrderProducts $orderProducts, Order $orders)
+    public function handle(Order $orders)
     {
         $userId = $this->data['userId'];
         $orderId = $this->data['orderId'];
