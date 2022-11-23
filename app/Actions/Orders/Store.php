@@ -5,10 +5,9 @@ namespace App\Actions\Orders;
 use App\Enums\Order\Status;
 use App\Jobs\OrderAfterCreateJob;
 use Illuminate\Support\Facades\Auth;
-use App\Contracts\OrdersContract;
 use App\Models\Order;
 
-class StoreOrder implements OrdersContract
+class Store
 {
     public function __invoke(array $data): int
     {

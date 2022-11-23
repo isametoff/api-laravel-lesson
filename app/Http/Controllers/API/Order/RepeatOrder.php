@@ -2,25 +2,16 @@
 
 namespace App\Http\Controllers\API\Order;
 
-use App\Actions\Orders\RepeatOrder as RepeatOrderAction;
+use App\Actions\Orders\Repeat;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\LoadOrderIdRequest;
 
 class RepeatOrder extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __invoke(LoadOrderIdRequest $request, Repeat $repeatOrderAction)
     {
-        $this->middleware('auth:api');
-    }
-
-    public function __invoke(LoadOrderIdRequest $request, RepeatOrderAction $repeatOrderAction)
-    {
-        $orderId = $repeatOrderAction($request->validated());
+        $data = $request->validated();
+        $orderId = $repeatOrderAction($data['orderId']);
         return compact('orderId');
     }
 }

@@ -5,34 +5,42 @@ namespace App\Actions\Orders;
 use App\Enums\Order\Status;
 use App\Jobs\OrderAfterCreateJob;
 use Illuminate\Support\Facades\Auth;
-use App\Contracts\OrdersContract;
 use App\Models\OrderProducts;
 use App\Models\Products;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 
-class RepeatOrder implements OrdersContract
+class Repeat
 {
-    public function __invoke(array $data): int
+    public function __invoke(int $orderId)
     {
         $userId = Auth::user()->id;
-        $dataOrderId = $data['orderId'];
+        $orders = Order::where('user_id', $userId)->where('status', Status::ADDED)->get();
 
-        $orderExample = Order::orderProducts($dataOrderId)->first();
+        $a = json_decode(DB::table('jobs')->first()->payload)->data->command;
+        $jobsItem = DB::table('jobs')->get();
+        foreach ($jobsItem as $jobs) {
+            dd($jobs);
+        }
+        // $b = json_decode($a)->data->command;
+        return $a;
+        return json_decode($a);
+        foreach ($orders as $order) {
+            Delete::index($order->id);
+        }
 
+        $orderExample = Index::orderProducts($orderId)->first();
         $orderRepeat = $orderExample->replicate([
             'created_at',
             'updated_at'
         ])->fill([
-            'status' => Status::WAITING,
+            'status' => Status::ADDED,
         ]);
         $orderRepeat->save();
         $orderId = $orderRepeat->id;
-        // return $orderId;
-
-
 
         foreach ($orderExample->products as $val) {
-            $productRest = Order::productsValue(Products::all(), $val->pivot->products_id, 'rest');
+            $productRest = Index::productsValue(Products::all(), $val->pivot->products_id, 'rest');
             $cnt = $productRest >= $val->pivot->product_count ? $val->pivot->product_count : $productRest;
             OrderProducts::firstOrCreate([
                 'order_id' => $orderRepeat->id,
@@ -44,7 +52,6 @@ class RepeatOrder implements OrdersContract
                     'rest' => $productRest - $cnt,
                 ]);
         }
-
         OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(5));
 
         return $orderId;

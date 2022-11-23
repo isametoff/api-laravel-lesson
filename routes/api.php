@@ -21,17 +21,18 @@ Route::post('/cart/add', AddToCart::class);
 Route::post('/cart/remove', RemoveCartProduct::class);
 Route::post('/cart/count', SetCountProductCart::class);
 Route::get('/products', IndexProduct::class);
+
 Route::post('/registration', RegistrationController::class);
 
-Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
+Route::group(['middleware' => 'auth:api', 'prefix' => 'auth'], function ($router) {
 
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth:api');
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('me', [AuthController::class, 'me']);
 });
 
-Route::group(['middleware' => 'api'], function ($router) {
+Route::group(['middleware' => 'auth:api'], function ($router) {
     Route::post('order', StoreOrder::class);
     Route::post('transaction', TransactionOrder::class);
     Route::post('order/load', LoadOrder::class);

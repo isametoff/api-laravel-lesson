@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Order;
+use App\Actions\Orders\Index;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -30,7 +30,7 @@ class OrderAfterCreateJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Order $orders)
+    public function handle(Index $orders)
     {
         $userId = $this->data['userId'];
         $orderId = $this->data['orderId'];

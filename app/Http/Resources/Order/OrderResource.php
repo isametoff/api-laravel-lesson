@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Order;
 
-use App\Models\Order;
+use App\Actions\Orders\Index as IndexOrderAction;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
@@ -21,7 +21,7 @@ class OrderResource extends JsonResource
             'user_id' => $this->user_id,
             'status' => $this->status,
             'orderId' => $this->id,
-            'totalPrice' => Order::totalPrice($this->id),
+            'totalPrice' => IndexOrderAction::totalPrice($this->id),
             'created' => $this->created_at->diffForHumans(),
             'count' => count($this->products),
             'products' => OrderProductsResource::collection($this->products),

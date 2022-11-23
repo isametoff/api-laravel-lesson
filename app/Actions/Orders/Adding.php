@@ -6,11 +6,10 @@ use App\Enums\Order\Status;
 use App\Jobs\OrderAfterCreateJob;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
-use App\Contracts\OrdersContract;
 use App\Models\OrderProducts;
 use App\Models\Products;
 
-class AddingOrder implements OrdersContract
+class Adding
 {
     public function __invoke(array $data): int
     {
@@ -22,7 +21,7 @@ class AddingOrder implements OrdersContract
         ]);
         $orderId = $order->id;
         foreach ($data['order'] as $val) {
-            $productRest = Order::productsValue(Products::all(), $val['id'], 'rest');
+            $productRest = Index::productsValue(Products::all(), $val['id'], 'rest');
             $cnt = $productRest >= $val['cnt'] ? $val['cnt'] : $productRest;
             OrderProducts::firstOrCreate([
                 'order_id' => $order->id,
@@ -33,8 +32,8 @@ class AddingOrder implements OrdersContract
                 'rest' => $productRest - $cnt,
             ]);
         }
-        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(5));
-        
+        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(1));
+
         return $orderId;
     }
 }
