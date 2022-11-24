@@ -14,6 +14,11 @@ class Adding
     public function __invoke(array $data): int
     {
         $userId = Auth::user()->id;
+        $orders = Order::where('user_id', $userId)->where('status', Status::ADDED)->get();
+
+        foreach ($orders as $order) {
+            Delete::index($userId, $order->id);
+        }
 
         $order = Order::create([
             'user_id' => $userId,
@@ -32,7 +37,7 @@ class Adding
                 'rest' => $productRest - $cnt,
             ]);
         }
-        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addMinutes(1));
+        OrderAfterCreateJob::dispatch(compact('orderId', 'userId'))->delay(now()->addSeconds(30));
 
         return $orderId;
     }

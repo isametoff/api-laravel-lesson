@@ -9,9 +9,8 @@ use App\Models\Products;
 
 class Delete
 {
-    public static function index(int $orderId): bool
+    public static function index(int $userId, int $orderId): bool
     {
-        $userId = Auth::user()->id;
         $ordersUserExist = Order::where('user_id', $userId)->where('id', $orderId)
             ->exists();
         Delete::returnReservedProduct($userId, $orderId);
@@ -21,11 +20,11 @@ class Delete
             ->where('id', $orderId)->doesntExist();
         return $message;
     }
-    public static function returnReservedProduct($userId, $orderId)
+    public static function returnReservedProduct(int $userId, int $orderId)
     {
         $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
         $orderProducts = $ordersUser->with('products')->first();
-
+        // dd($userId, $orderId);
         foreach ($orderProducts->products as $product) {
             $rest = Products::where('id', $product->pivot->products_id)->value('rest');
             Products::where('id', $product->pivot->products_id)

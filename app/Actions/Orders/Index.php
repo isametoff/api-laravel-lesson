@@ -39,36 +39,27 @@ class Index
     }
     public static function orderReserve($userId, $orderId)
     {
-        $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
-        $orderProducts = $ordersUser->with('products')->first();
+        $isOrder = Order::where('user_id', $userId)->where('id', $orderId)->exists();
+        $orderUser = Order::where('user_id', $userId)->where('id', $orderId);
         $waiting = get_object_vars(Status::WAITING);
         $added = get_object_vars(Status::ADDED);
 
-        if ($ordersUser->first()->status === $added['value']) {
-            Delete::deleteOrder($userId, $orderId);
-        }
-        if ($ordersUser->first()->status === $waiting['value']) {
-            OrderAfterCheckingJob::dispatch(compact('orderId', 'userId'))->delay(now()->addSeconds(6));
+        if ($isOrder === true) {
+            if ($orderUser->first()->status === $added['value']) {
+                Delete::index($userId, $orderId);
+            } elseif ($orderUser->first()->status === $waiting['value']) {
+                OrderAfterCheckingJob::dispatch(compact('userId', 'orderId'))->delay(now()->addSeconds(0));
+            }
         }
     }
     public static function orderCanceled(int $userId, int $orderId)
     {
-        $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
-        $orderProducts = $ordersUser->with('products')->first();
+        $isOrder = Order::where('user_id', $userId)->where('id', $orderId)->exists();
+        $orderUser = Order::where('user_id', $userId)->where('id', $orderId);
         $waiting = get_object_vars(Status::WAITING);
-        $canceled = get_object_vars(Status::CANCELED);
 
-
-        if ($ordersUser->first()->status === $waiting['value']) {
-            Index::deleteOrder($userId, $orderId);
-        } elseif ($ordersUser->first()->status === $canceled['value']) {
-            foreach ($orderProducts->products as $product) {
-                $rest = Products::where('id', $product->pivot->products_id)->value('rest');
-                Products::where('id', $product->pivot->products_id)
-                    ->update([
-                        'rest' => $rest + $product->pivot->product_count,
-                    ]);
-            }
+        if ($orderUser->first()->status === $waiting['value'] && $isOrder === true) {
+            Delete::index($userId, $orderId);
         }
     }
 }

@@ -36,7 +36,7 @@ class OrderAfterCreateJob implements ShouldQueue
         $orderId = $this->data['orderId'];
         $orderReserve = $orders->orderReserve($userId, $orderId);
 
-        Log::info($orderReserve);
+        Log::info('Готово1');
     }
 
     // public function failed()

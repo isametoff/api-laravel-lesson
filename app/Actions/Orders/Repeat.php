@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\OrderProducts;
 use App\Models\Products;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
 
 class Repeat
 {
@@ -17,17 +16,6 @@ class Repeat
         $userId = Auth::user()->id;
         $orders = Order::where('user_id', $userId)->where('status', Status::ADDED)->get();
 
-        $a = json_decode(DB::table('jobs')->first()->payload)->data->command;
-        $jobsItem = DB::table('jobs')->get();
-        foreach ($jobsItem as $jobs) {
-            dd($jobs);
-        }
-        // $b = json_decode($a)->data->command;
-        return $a;
-        return json_decode($a);
-        foreach ($orders as $order) {
-            Delete::index($order->id);
-        }
 
         $orderExample = Index::orderProducts($orderId)->first();
         $orderRepeat = $orderExample->replicate([
@@ -36,6 +24,11 @@ class Repeat
         ])->fill([
             'status' => Status::ADDED,
         ]);
+
+        foreach ($orders as $order) {
+            Delete::index($userId, $order->id);
+        }
+
         $orderRepeat->save();
         $orderId = $orderRepeat->id;
 

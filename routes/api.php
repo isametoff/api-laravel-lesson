@@ -5,6 +5,7 @@ use App\Http\Controllers\API\Cart\IndexCart;
 use App\Http\Controllers\API\Cart\RemoveCartProduct;
 use App\Http\Controllers\API\Cart\SetCountProductCart;
 use App\Http\Controllers\API\Order\AddingOrder;
+use App\Http\Controllers\API\Order\CancelOrder;
 use App\Http\Controllers\API\Order\DeleteOrder;
 use App\Http\Controllers\API\Order\LoadAllOrders;
 use App\Http\Controllers\API\Order\LoadOrder;
@@ -28,7 +29,7 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'auth'], function ($router
 
     Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth:api');
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('refresh', [AuthController::class, 'refresh'])->withoutMiddleware('auth:api');
     Route::post('me', [AuthController::class, 'me']);
 });
 
@@ -40,4 +41,5 @@ Route::group(['middleware' => 'auth:api'], function ($router) {
     Route::post('order/delete', DeleteOrder::class);
     Route::post('order/repeat', RepeatOrder::class);
     Route::post('order/adding', AddingOrder::class);
+    Route::post('order/cancel', CancelOrder::class);
 });
