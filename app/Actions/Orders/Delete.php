@@ -2,6 +2,7 @@
 
 namespace App\Actions\Orders;
 
+use App\Enums\Order\Status;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderProducts;
@@ -11,13 +12,14 @@ class Delete
 {
     public static function index(int $userId, int $orderId): bool
     {
-        $ordersUserExist = Order::where('user_id', $userId)->where('id', $orderId)
-            ->exists();
-        Delete::returnReservedProduct($userId, $orderId);
+        $order = Order::where('user_id', $userId)->where('id', $orderId);
+        $unfinished = $order->whereIn('status', [Status::WAITING, Status::ADDED])->exists();
+        if ($unfinished === true) {
+            Delete::returnReservedProduct($userId, $orderId);
+        }
         Order::where('user_id', $userId)->where('id', $orderId)->delete();
         OrderProducts::where('order_id', $orderId)->delete();
-        $message = Order::where('user_id', $userId)
-            ->where('id', $orderId)->doesntExist();
+        $message = $order->doesntExist();
         return $message;
     }
     public static function returnReservedProduct(int $userId, int $orderId)
