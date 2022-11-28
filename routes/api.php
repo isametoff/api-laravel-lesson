@@ -15,6 +15,7 @@ use App\Http\Controllers\API\Order\TransactionOrder;
 use App\Http\Controllers\API\User\RegistrationController;
 use App\Http\Controllers\API\User\AuthController;
 use App\Http\Controllers\IndexProduct;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/cart', IndexCart::class);
@@ -23,7 +24,11 @@ Route::post('/cart/remove', RemoveCartProduct::class);
 Route::post('/cart/count', SetCountProductCart::class);
 Route::get('/products', IndexProduct::class);
 
-Route::post('/registration', RegistrationController::class);
+Auth::routes();
+Auth::routes(['verify' => true]);
+Route::post('/registration', [RegistrationController::class, 'create']);
+Route::get('/verifyemail/{token}', [RegistrationController::class, 'verify']);
+Route::get('/repeatverifyemail/{token}', [RegistrationController::class, 'repeatVerify']);
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'auth'], function ($router) {
 
