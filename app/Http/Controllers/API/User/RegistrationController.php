@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\EmailTokenRequest;
 use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UserIdRequest;
 use App\Jobs\SendVerificationEmail;
 use App\Models\User;
 use Carbon\Carbon;
@@ -39,8 +41,10 @@ class RegistrationController extends Controller
      * @param $token
      * @return \Illuminate\Http\Response
      */
-    public function verify($token)
+    public function verify(EmailTokenRequest $request)
     {
+        $data = $request->validated();
+        $token = $data['email_token'];
         $validToken = User::where('email_token', $token)->exists();
         if (!$validToken) {
             return 'Link is invalid';
@@ -49,7 +53,7 @@ class RegistrationController extends Controller
             $created = User::where('email_token', $token)->value('updated_at');
             $now = Carbon::now();
             $date = Carbon::parse($created);
-            $validToken = $date->diffInMinutes($now) > 1;
+            $validToken = $date->diffInMinutes($now) < 1;
             $user = User::where('email_token', $token)->first();
             $userId = User::where('email_token', $token)->value('id');
             if ($validToken === true) {
@@ -63,8 +67,10 @@ class RegistrationController extends Controller
         return view('emailconfirm');
     }
 
-    public function repeatVerify(int $userId)
+    public function repeatVerify(UserIdRequest $request)
     {
+        $data = $request->validated();
+        $userId = $data['userId'];
         User::where('id', $userId)
             ->update([
                 'email_token' => Str::random(30),
