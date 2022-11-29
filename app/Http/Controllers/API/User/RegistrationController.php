@@ -41,35 +41,36 @@ class RegistrationController extends Controller
      */
     public function verify($token)
     {
-        $created = User::where('email_token', $token)->value('updated_at');
-        // dd($token);
-        $now = Carbon::now();
-        // dd($created->diff($now))->days;
-        // $validToken = Carbon::parse($created)->floatDiffInMinutes(Carbon::now());
-        $date = Carbon::parse($created);
-        $validToken = $date->diffInMinutes($now);
-        $user = User::where('email_token', $token)->first();
-        dd(User::all()->last());
-        if ($validToken == true) {
-            $user->email_verified_at = now();
-            $user->save();
-            return view('emailconfirm');
-        } else {
-            return RegistrationController::repeatVerify($token);
+        $validToken = User::where('email_token', $token)->exists();
+        if (!$validToken) {
+            return 'Link is invalid';
         }
+        if (!User::where('email_token', $token)->value('email_verified_at')) {
+            $created = User::where('email_token', $token)->value('updated_at');
+            $now = Carbon::now();
+            $date = Carbon::parse($created);
+            $validToken = $date->diffInMinutes($now) > 1;
+            $user = User::where('email_token', $token)->first();
+            $userId = User::where('email_token', $token)->value('id');
+            if ($validToken === true) {
+                $user->email_verified_at = now();
+                $user->save();
+                return view('emailconfirm');
+            } else {
+                return view('email.repeat_verify_account', compact('userId'));
+            }
+        }
+        return view('emailconfirm');
     }
 
-    public function repeatVerify($token)
+    public function repeatVerify(int $userId)
     {
-        return "lll";
-        $created = User::where('email_token', $token)->value('updated_at');
-        $validToken = Carbon::parse($created)->floatDiffInMinutes(now()) < 1;
-
-        $user = User::where('email_token', $token)
+        User::where('id', $userId)
             ->update([
-                'email_token' => Str::random(40),
+                'email_token' => Str::random(30),
             ]);
+        $user = User::where('id', $userId)->first();
         dispatch(new SendVerificationEmail($user));
-        return view('email.repeat_verify_account', ['user' => $user]);
+        return view('returnemailconfirm');
     }
 }

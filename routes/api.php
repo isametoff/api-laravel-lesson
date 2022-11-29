@@ -27,8 +27,9 @@ Route::get('/products', IndexProduct::class);
 Auth::routes();
 Auth::routes(['verify' => true]);
 Route::post('/registration', [RegistrationController::class, 'create']);
-Route::get('/verifyemail/{token}', [RegistrationController::class, 'verify']);
-Route::get('/repeatverifyemail/{token}', [RegistrationController::class, 'repeatVerify']);
+Route::get('/verifyemail/{token}', [RegistrationController::class, 'verify'])->name('account.verify');
+Route::get('/repeatverifyemail/{userId}', [RegistrationController::class, 'repeatVerify'])->name('account.repeatverify');
+
 
 Route::group(['middleware' => 'auth:api', 'prefix' => 'auth'], function ($router) {
 
