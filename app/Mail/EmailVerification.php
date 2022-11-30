@@ -5,8 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\URL;
 
 class EmailVerification extends Mailable
 {
@@ -33,7 +31,6 @@ class EmailVerification extends Mailable
     {
         return $this->view('email.verify_account')->with([
             'email_token' => $this->user->email_token,
-            '' => $this->user->email_token,
         ]);
     }
 }
