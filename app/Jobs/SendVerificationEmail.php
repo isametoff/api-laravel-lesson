@@ -34,11 +34,11 @@ class SendVerificationEmail implements ShouldQueue
     public function handle()
     {
         $email = new EmailVerification($this->user);
-        // Mail::to('isametoff@gmail.com')->send($email);
+        Mail::to('isametoff@gmail.com')->send($email);
         // Mail::from('isametoff@gmail.com');
-        Mail::send(['text' => 'mail'], $email, function ($message) {
-            $message->to('isametoff@gmail.com', 'Tutorials Point')->subject('Laravel Basic Testing Mail');
-            $message->from('isametoff@gmail.com', 'Virat Gandhi');
-        });
+        // Mail::send(['text' => 'mail'], function ($message) {
+        //     $message->to('isametoff@gmail.com', 'Tutorials Point')->subject('Laravel Basic Testing Mail');
+        //     $message->from('isametoff@gmail.com', 'Virat Gandhi');
+        // });
     }
 }
