@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Order;
 
-use App\Http\Requests\Cart\ApiRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class StoreOrderRequest extends ApiRequest
+class StoreOrderRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -15,13 +15,7 @@ class StoreOrderRequest extends ApiRequest
     public function rules()
     {
         return [
-            'orderId' => 'required|numeric',
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'required' => 'Это поле необходимо для заполнения',
+            'ids' => 'required|array',
         ];
     }
 }

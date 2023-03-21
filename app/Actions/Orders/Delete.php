@@ -13,7 +13,7 @@ class Delete
     public static function index(int $userId, int $orderId): bool
     {
         $order = Order::where('user_id', $userId)->where('id', $orderId);
-        $unfinished = $order->whereIn('status', [Status::WAITING, Status::ADDED])->exists();
+        $unfinished = $order->whereIn('status', [0, 1])->exists();
         if ($unfinished === true) {
             Delete::returnReservedProduct($userId, $orderId);
         }
@@ -22,17 +22,14 @@ class Delete
         $message = $order->doesntExist();
         return $message;
     }
-    public static function returnReservedProduct(int $userId, int $orderId)
+    public static function returnReservedProduct(int $orderId)
     {
-        $ordersUser = Order::where('user_id', $userId)->where('id', $orderId);
+        $ordersUser = Order::where('id', $orderId);
         $orderProducts = $ordersUser->with('products')->first();
-        // dd($userId, $orderId);
         foreach ($orderProducts->products as $product) {
-            $rest = Products::where('id', $product->pivot->products_id)->value('rest');
-            Products::where('id', $product->pivot->products_id)
-                ->update([
-                    'rest' => $rest + $product->pivot->product_count,
-                ]);
+            Products::withTrashed()
+                ->where('id', $product->id)
+                ->restore();
         }
     }
 }

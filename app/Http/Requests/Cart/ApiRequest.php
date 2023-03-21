@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Cart;
 
+use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 
 abstract class ApiRequest extends FormRequest
 {
@@ -13,9 +15,12 @@ abstract class ApiRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(Request $request)
     {
-        return true;
+        // return $request->header('x-forwarded-for');
+        if (User::where('id', auth()->id())->value('ip') === $request->header('x-forwarded-for')) {
+            return true;
+        }
     }
 
     /**

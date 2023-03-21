@@ -16,14 +16,24 @@ class Products extends Model
     protected $fillable =
     [
         'id',
-        'title',
-        'description',
-        'content',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'sex',
+        'dob_year',
+        'state',
+        'sity',
+        'dl',
+        'zip',
         'price',
-        'rest',
-        'is_published',
         'updated_at',
         'deleted_at',
-
     ];
+
+    public static function allProducts()
+    {
+        $orderIds = Order::where('user_id', auth()->id())->pluck('id')->all();
+        $orderProductsIds = OrderProducts::whereIn('order_id', $orderIds)->pluck('products_id')->all();
+        return Products::whereNotIn('id', $orderProductsIds);
+    }
 }

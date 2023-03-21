@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,9 +20,11 @@ class User extends Authenticatable implements JWTSubject
     protected $table = 'users';
     protected $fillable = [
         'login',
-        'email',
+        'telegram',
+        'balance',
+        'role',
         'password',
-        'email_token',
+        'adress_pay',
         'created_at',
         'updated_at',
     ];
@@ -44,9 +45,31 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime:Y-m-d',
-        // 'created_at' => 'datetime:Y-m-d',
-
     ];
+
+    /**
+     * The channels the user receives notification broadcasts on.
+     *
+     * @return string
+     */
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'users.' . $this->id;
+    }
+
+    public function notificationMessages()
+    {
+        return $this->hasMany(UserNotifications::class);
+    }
+
+    public function activiness()
+    {
+        return $this->hasMany(UserActiviness::class);
+    }
+    public function passwords()
+    {
+        return $this->hasMany(UserPasswords::class);
+    }
 
     public function getJWTIdentifier()
     {

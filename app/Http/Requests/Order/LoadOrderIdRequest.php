@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Order;
 
-use App\Http\Requests\Cart\ApiRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class LoadOrderIdRequest extends ApiRequest
+class LoadOrderIdRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -16,12 +16,6 @@ class LoadOrderIdRequest extends ApiRequest
     {
         return [
             'orderId' => 'required|numeric',
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'required' => 'Это поле необходимо для заполнения',
         ];
     }
 }

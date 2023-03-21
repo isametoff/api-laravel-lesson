@@ -17,15 +17,11 @@ class Order extends Model
     [
         'id',
         'user_id',
-        'count',
+        'price',
         'status',
         'updated_at',
         'deleted_at',
     ];
-    // protected $casts = [
-    //     'status' => Status::class,
-    //     'options' => Base64Json::class
-    // ];
 
     public function user()
     {
@@ -38,6 +34,6 @@ class Order extends Model
             'order_products',
             'order_id',
             'products_id',
-        )->withPivot('product_count',)->withTimestamps();
+        )->withTimestamps();
     }
 }

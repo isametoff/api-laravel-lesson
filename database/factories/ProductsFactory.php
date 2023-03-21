@@ -17,12 +17,25 @@ class ProductsFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker->unique()->company,
-            'description' => $this->faker->paragraph,
-            'content' => $this->faker->paragraph,
-            'price' => $this->faker->numberBetween(1500, 6000),
-            'rest' => $this->faker->numberBetween(1, 6),
-            'is_published' => 1,
+            'first_name' => $this->faker->firstName,
+            'middle_name' => null,
+            'last_name' => $this->faker->lastName,
+            'sex' => $this->faker->randomElement(['M', 'F', 'N']),
+            'country' => 'us',
+            'adress' => $this->faker->address(),
+            'adress2' => $this->faker->address(),
+            'work_phone' => null,
+            'home_phone' => '4043789865',
+            'marital_status' => $this->faker->randomElement(['Single', 'Married']),
+            'email' => $this->faker->email(),
+            'dob_year' => '2012',
+            // 'dob_year' => '2012/01/31',
+            'state' => $this->faker->state,
+            'sity' => $this->faker->city,
+            'dl' => $this->faker->randomElement([null, 12121212]),
+            // 'dl' => $this->faker->numberBetween(0, 60000000),
+            'zip' => $this->faker->numberBetween(10000, 90000),
+            'price' => $this->faker->numberBetween(1, 3),
         ];
     }
 }

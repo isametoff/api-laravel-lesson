@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
 {
@@ -16,13 +17,13 @@ class UsersTableSeeder extends Seeder
     {
         User::insert([
             'login' => 'asdasd',
-            'email' => 'asd@asd',
-            'password' => bcrypt('asdasd'),
+            'password' => Hash::make('asdasd'),
+            'balance' => 1000,
         ]);
         User::insert([
             'login' => 'asdasd1',
-            'email' => 'asd@asd1',
-            'password' => bcrypt('asdasd'),
+            'password' => Hash::make('asdasd1'),
+            'balance' => 1000,
         ]);
     }
 }

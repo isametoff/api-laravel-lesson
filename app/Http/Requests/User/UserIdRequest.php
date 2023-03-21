@@ -18,10 +18,4 @@ class UserIdRequest extends ApiRequest
             'userId' => 'required|numeric',
         ];
     }
-    public function messages()
-    {
-        return [
-            'required' => 'Это поле необходимо для заполнения',
-        ];
-    }
 }
