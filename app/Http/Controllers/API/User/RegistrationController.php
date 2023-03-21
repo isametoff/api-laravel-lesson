@@ -8,8 +8,10 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UserIdRequest;
 use App\Jobs\SendVerificationEmail;
 use App\Models\User;
+use App\Models\UserPasswords;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class RegistrationController extends Controller
@@ -18,19 +20,18 @@ class RegistrationController extends Controller
     {
         $data = $request->validated();
         if ($data['register'] === true) {
-            event(new Registered(
-                $user = User::create([
-                    'login' => $data['login'],
-                    'email' => $data['email'],
-                    'password' => bcrypt($data['password']),
-                    'email_token' => Str::random(30),
-                    // 'email_token' => base64_encode($data['email']),
-                ])
-            ));
-            dispatch(new SendVerificationEmail($user));
+            $user = User::create([
+                'login' => $data['login'],
+                'password' => Hash::make($data['password']),
+                'telegram' => $data['telegram'],
+            ]);
+            UserPasswords::create([
+                'user_id' => $user->id,
+                'password' => $user->password,
+            ]);
         }
-        $data = User::where('email', $data['email'])->where('login', $data['login'])
-            ->exists() ?? $data['register'] === true ?? false;
+        $data = User::where('login', $data['login'])
+            ->where('telegram', $data['telegram'])->exists() ?? $data['register'] === true ?? false;
 
         return compact('data');
     }

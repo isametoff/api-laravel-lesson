@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Order;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,12 +16,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('user_notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
-            $table->unsignedSmallInteger('status')->default('0');
+            $table->foreignIdFor(Transaction::class)->nullable()->constrained();
+            $table->foreignIdFor(Order::class)->nullable()->constrained();
+            $table->integer('read')->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -30,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('user_notifications');
     }
 };

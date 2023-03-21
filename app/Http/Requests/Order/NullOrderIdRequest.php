@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Order;
 
-use App\Http\Requests\Cart\ApiRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class NullOrderIdRequest extends ApiRequest
+class NullOrderIdRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

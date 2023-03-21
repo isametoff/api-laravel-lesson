@@ -37,4 +37,7 @@ prod_deploy:
     - docker exec ${CONTAINER_PREFIX}_app php artisan config:cache
     - docker exec ${CONTAINER_PREFIX}_app php artisan route:cache
     - docker exec ${CONTAINER_PREFIX}_app php artisan optimize
+    - docker exec ${CONTAINER_PREFIX}_app php artisan key:generate
+    - docker exec ${CONTAINER_PREFIX}_app php artisan jwt:secret
+
 

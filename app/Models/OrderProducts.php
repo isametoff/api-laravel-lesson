@@ -18,13 +18,16 @@ class OrderProducts extends Pivot
         'id',
         'order_id',
         'products_id',
-        'product_count',
         'updated_at',
         'deleted_at',
     ];
 
-    // public function orders()
-    // {
-    //     return $this->belongsToMany(Order::class);
-    // }
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+    public function products()
+    {
+        return $this->belongsTo(Products::class);
+    }
 }

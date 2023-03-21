@@ -2,29 +2,21 @@
 
 namespace App\Http\Requests\User;
 
-use App\Http\Requests\Cart\ApiRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class AuthUserRequest extends ApiRequest
+class AuthUserRequest extends FormRequest
 {
-
-
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
     public function rules()
     {
         return [
-
-            'login' => 'required|min:6|max:255',
-            'password' => 'required|min:6|max:255',
+            'login' => 'bail|required|min:6|regex:/^\S+$/u|max:255',
+            'password' => 'bail|required|min:6|regex:/^\S+$/u|max:255',
             'isAuth' => 'required'
-
-
-        ];
-    }
-    public function messages()
-    {
-        return [
-            'login.required' => 'Введите логин',
-            'password.required' => 'Введите пароль',
-            'min' => 'Минимальное значение 6',
         ];
     }
 }

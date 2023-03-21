@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources\Products;
 
+use App\Actions\Index;
+use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class IndexProductsResource extends JsonResource
@@ -16,12 +19,17 @@ class IndexProductsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'content' => $this->content,
+            'full_name' => $this->first_name . ' ' . $this->last_name,
+            'sex' => $this->sex,
+            'dob_year' => $this->dob_year,
+            // 'dob_year' => DateTime::createFromFormat('d/m/Y', $this->dob_year)->format('Y'),
+            // 'dob_year' => Carbon::createFromFormat('d-m-Y', DateTime::createFromFormat('d/m/Y', $this->dob_year)->format('d-m-Y'))->format('Y'),
+            // 'dob_year' => Carbon::createFromFormat('Y-m-d', $this->dob_year)->format('Y'),
+            'state' => $this->state,
+            'sity' => $this->sity,
+            'dl' => strlen($this->dl) > 0,
+            'zip' => $this->zip,
             'price' => $this->price,
-            'rest' => $this->rest,
-            'is_published' => $this->is_published,
         ];
     }
 }

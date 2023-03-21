@@ -18,10 +18,4 @@ class EmailTokenRequest extends ApiRequest
             'email_token' => 'required|string',
         ];
     }
-    public function messages()
-    {
-        return [
-            'required' => 'Это поле необходимо для заполнения',
-        ];
-    }
 }
